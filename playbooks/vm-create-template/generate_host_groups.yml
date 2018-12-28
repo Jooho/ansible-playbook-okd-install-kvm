@@ -1,0 +1,5 @@
+- debug: var=group_names
+- name: Add ansible controller to memory
+  add_host:
+    name: "{{ hostvars['ansible_controller'].ip }}"
+    groups: ansible-controller

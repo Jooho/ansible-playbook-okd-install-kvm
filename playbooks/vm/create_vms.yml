@@ -1,0 +1,76 @@
+
+- name: Create Master VMs
+  include_role:   # for using loops
+    name: Jooho.kvm_operate
+  vars:
+    kind: vm
+    operate: clone
+    src_vm: "{{ base_vm_name }}"
+    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{master_node_prefix}}_{{item}}"
+    vm_network_br: "{{ kvm.network_br }}"
+    dest_vm_hostname: "{{ master_node_prefix }}{{item}}.{{ okd_dns_domain}}"    
+    vm_recreate: "{{ okd_vm_recreate }}"
+    vm_memory: "{{ master_vm_memory }}"
+  loop: "{{ range(1,master_node_vms|int + 1,1)|list }}"
+  when: master_node_vms is defined and master_node_vms > 0  
+
+ 
+- name: Create Infra VMs
+  include_role:   # for using loops
+    name: Jooho.kvm_operate
+  vars:
+    kind: vm
+    operate: clone
+    src_vm: "{{ base_vm_name }}"
+    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{infra_node_prefix}}_{{item}}"
+    vm_network_br: "{{ kvm.network_br }}"
+    dest_vm_hostname: "{{ infra_node_prefix }}{{item}}.{{ okd_dns_domain}}"    
+    vm_recreate: "{{ okd_vm_recreate }}"
+    vm_memory: "{{ infra_vm_memory }}"
+  loop: "{{ range(1,infra_node_vms|int + 1 ,1)|list }}"
+  when: infra_node_vms is defined and infra_node_vms > 0  
+
+
+- name: Create App VMs
+  include_role:   # for using loops
+    name: Jooho.kvm_operate
+  vars:
+    kind: vm
+    operate: clone
+    src_vm: "{{ base_vm_name }}"
+    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{app_node_prefix}}_{{item}}"
+    vm_network_br: "{{ kvm.network_br }}"
+    dest_vm_hostname: "{{ app_node_prefix }}{{item}}.{{ okd_dns_domain}}"    
+    vm_recreate: "{{ okd_vm_recreate }}"
+    vm_memory: "{{ app_vm_memory }}"
+  loop: "{{ range(1,app_node_vms|int + 1,1)|list }}"
+  when: app_node_vms is defined and app_node_vms > 0  
+
+- name: Create ETCD VMs
+  include_role:   # for using loops
+    name: Jooho.kvm_operate
+  vars:
+    kind: vm
+    operate: clone
+    src_vm: "{{ base_vm_name }}"
+    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{etcd_node_prefix}}_{{item}}"
+    vm_network_br: "{{ kvm.network_br }}"
+    dest_vm_hostname: "{{ etcd_node_prefix }}{{item}}.{{ okd_dns_domain}}"    
+    vm_recreate: "{{ okd_vm_recreate }}"
+    vm_memory: "{{ app_vm_memory }}"
+  loop: "{{ range(1,etcd_node_vms|int + 1,1)|list }}"
+  when: etcd_node_vms is defined and etcd_node_vms > 0  
+
+- name: Create LB VM
+  include_role:   # for using loops
+    name: Jooho.kvm_operate
+  vars:
+    kind: vm
+    operate: clone
+    src_vm: "{{ base_vm_name }}"
+    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{lb_node_prefix}}"
+    vm_network_br: "{{ kvm.network_br }}"
+    dest_vm_hostname: "{{ lb_node_prefix }}.{{ okd_dns_domain}}"    
+    vm_recreate: "{{ okd_vm_recreate }}"
+    vm_memory: "{{ lb_vm_memory }}"
+  when: master_node_vms|int > 1 

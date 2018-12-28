@@ -1,0 +1,42 @@
+
+
+- hosts: localhost
+  tasks:
+    - name: Teardown VMs with prefix_vm
+      import_role:
+        name: Jooho.kvm_operate
+      vars:
+        kind: vm
+        prefix_vm: "{{ cluster_tag }}"
+        kvm_install_host: "{{ kvm.install_host}}"
+        operate: teardown
+      
+    - name: Delete dnsmasq conf
+      file: "path={{ interim_dns.dns_conf_path }}/{{ interim_dns.dns_conf_name }}.conf state=absent"
+      become: yes
+      delegate_to: "{{ interim_dns.install_host }}"
+     
+    - name: Gather files under KVM storage pool path
+      find: 
+        paths: "{{ kvm.storage_pool_dir }}"
+        patterns: "{{ cluster_tag }}*"
+      become: yes
+      register: vm_images_list
+
+    - debug: var=vm_images_list
+    
+    - name: Make sure to delete images
+      file: "path={{ item.path }} state=absent"
+      become: yes
+      with_items:
+      - "{{ vm_images_list.files }}"
+      
+
+    - name: Delete hosts from known_hosts
+      lineinfile:
+        path: "{{ user_home }}/.ssh/known_hosts"
+        state: absent
+        regexp: "{{item}}"
+      with_items:
+        - "example.com"
+        - "192.168.200"

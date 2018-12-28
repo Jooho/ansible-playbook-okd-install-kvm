@@ -1,0 +1,18 @@
+---
+
+- name: Add DNS1 to search dns itself first
+  shell: "ssh -o StrictHostKeyChecking=no centos@{{ vm_ip.stdout }} -- sudo hostnamectl set-hostname {{ dest_vm_hostname }}"
+  delegate_to: "{{ kvm_install_host }}"
+  ignore_errors: yes
+  register: change_hostname
+  until: "{{ change_hostname is succeeded}}"
+  delay: 5
+  when: dest_vm_hostname is defined
+# - name: Copy host ssh public/private key to AC
+#   copy: dest=/home/centos/.ssh/id_rsa src=~/.ssh/id_rsa mode=0600
+
+# - name: Add AC to ssh authorized 
+
+# - name: Add AC to ssh known_hosts
+
+# - name: Copy Git repos to AC

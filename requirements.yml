@@ -1,0 +1,7 @@
+- src: Jooho.kvm_provider_okd
+- src: Jooho.kvm_cloud_init_vm
+- src: Jooho.kvm_operate
+- src: Jooho.dnsmasq_operate
+- src: Jooho.copy_ssh_pub_key
+- src: Jooho.okd_generate_ansible_hosts
+- src: Jooho.okd_prerequisites

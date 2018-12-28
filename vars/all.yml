@@ -1,0 +1,108 @@
+# Distinguish Each Cluster
+# tag: 311-1220
+timestamp: "{{ lookup('pipe', 'date +%m%d') }}"
+default_cluster_tag: "{{ okd_short_version }}-{{ timestamp }}"
+cluster_tag: "{{ tag|default(default_cluster_tag) }}"
+
+user_home: /home/jooho
+
+# KVM config
+kvm: 
+  log_dir: /tmp/kvm 
+  storage_pool_name: Public
+  storage_pool_dir: /home/jooho/KVM
+  install_host: localhost
+  network_br: okd
+
+
+# Base Image Config
+vm_data_dir: /home/jooho/kvm/vms
+base_vm_name: CentOS_Base
+base_image:
+  os: CentOS
+  version: 7
+  vm_recreate: true
+  cloud_init_vm_image: CentOS-7-x86_64-GenericCloud.qcow2
+  cloud_init_vm_image_link: "https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1809.qcow2"
+  cloud_init_user_data: "{{ vm_data_dir }}/{{ base_vm_name }}/user-data"
+  cloud_init_meta_data: "{{ vm_data_dir }}/{{ base_vm_name }}/meta-data"
+  cloud_init_iso_image: "{{ vm_data_dir }}/{{ base_vm_name }}/cidata.iso"
+  vm_local_hostname: base.example.com
+  vm_hostname: base.example.com
+  vm_public_key: "{{ lookup('file', user_home + '/.ssh/id_rsa.pub') }}"
+  vm_cpu: 2
+  vm_memory: 4096
+  vm_root_disk_size: 20G
+
+# Interim DNS
+interim_dns:
+  dns_conf_name: "OKD{{ okd_short_version }}"
+  dns_conf_path: /etc/NetworkManager/dnsmasq.d
+  rewrite_conf: no
+  rewrite_forward_conf: no
+  install: false
+  install_host: localhost
+  #forwarder_dns:
+  #  - 8.8.8.8
+
+
+# OKD
+
+okd_param_dir: "{{ current_path }}/vars"
+okd_version: 3.11      
+okd_short_version: "{{ okd_version|regex_replace('\\.')}}"
+okd_docker_version: 1.13.1  
+okd_docker_storage_size: 20G 
+okd_docker_storage_disk: vdb       
+okd_interim_dns_use: true
+okd_interim_dns_ip: 192.168.200.1
+okd_dns_domain: example.com
+okd_cluster_subdomain: "cloudapps-{{cluster_tag}}.{{okd_dns_domain}}"
+okd_master_cluster_hostname: "masters-{{cluster_tag}}.{{okd_dns_domain}}"
+okd_vm_recreate: false
+okd_ansible_playbook_path: /tmp/openshift-ansible
+
+
+# OpenShift Cluster VMs
+# if infra_node_vms is not specified, it assumes app node have "region=infra" labels
+# infra_node_vms
+# if etcd_node_vms is not specified, etcd will be deploying on masters
+# etcd_node_vms
+master_node_vms: 3
+master_vm_memory: 2G
+infra_node_vms: 3
+infra_vm_memory: 4G
+app_node_vms: 2
+app_vm_memory: 4G
+lb_vm_memory: 2G
+master_node_prefix: master
+infra_node_prefix: infra
+app_node_prefix: app
+etcd_node_prefix: etcd
+lb_node_prefix: lb
+
+
+# Do not change
+prometheus_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-prometheus/config.yml"
+cfme_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-management/config.yml"
+cfme_uninstall_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-management/uninstall.yml"
+metrics_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-metrics/config.yml"
+logging_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-logging/config.yml"
+service_catalog_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-service-catalog/config.yml"
+webconsole_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-web-console/config.yml"
+healthcheck_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-checks/pre-install.yml"
+nfs_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-nfs/config.yml"
+okd_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/deploy_cluster.yml"
+prequisites_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/prerequisites.yml"
+scale_up_node_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-node/scaleup.yml"
+scale_up_master_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-master/scaleup.yml"
+scale_up_etcd_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-etcd/scaleup.yml"
+
+health_check_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-checks/pre-install.yml"
+glusterfs_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-glusterfs/config.yml"
+monitoring_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-monitoring/config.yml"
+availability_monitoring_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-monitor-availability/config.yml"
+management_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-management/config.yml"
+descheduler_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-descheduler/config.yml"
+node_problem_detector_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-node-problem-detector/config.yml"
+autoheal_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-autoheal/config.yml"

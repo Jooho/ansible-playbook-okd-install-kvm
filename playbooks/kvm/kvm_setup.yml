@@ -1,0 +1,60 @@
+---
+
+- name: Install KVM
+  import_role:
+    name: Jooho.kvm_provider_okd
+  vars:
+    kvm_install_host: "{{ kvm.install_host }}"
+    kvm_log_dir: "{{ kvm.log_dir }}"
+    kvm_storage_pool_dir: "{{ kvm.storage_pool_dir }}"
+    kvm_storage_pool_name: "{{ kvm.storage_pool_name }}"  
+
+- name: Deploy base image
+  import_role:
+    name: Jooho.kvm_cloud_init_vm
+  vars:
+    kvm_install_host: "{{ kvm.install_host }}"
+    kvm_vm_pool_dir: "{{ kvm.storage_pool_dir }}"
+    vm_network_br: "{{ kvm.network_br }}"     
+    vm_data_dir: "{{ vm_data_dir }}"
+    vm_recreate: "{{ base_image.vm_recreate }}"
+    cloud_init_vm_image: "{{ base_image.cloud_init_vm_image }}"
+    cloud_init_vm_image_link: "{{ base_image.cloud_init_vm_image_link }}"             
+    vm_name: "{{ base_vm_name }}"
+    vm_local_hostname: "{{ base_image.vm_local_hostname }}"
+    vm_hostname: "{{ base_image.vm_hostname }}"
+    vm_public_key: "{{ base_image.vm_public_key }}"
+    vm_cpu: "{{ base_image.vm_cpu }}"
+    vm_memory: "{{ base_image.vm_memory }}"
+    vm_root_disk_size: "{{ base_image.vm_root_disk_size }}"
+
+- name: Refresh inventory to ensure new instaces exist in inventory
+  meta: refresh_inventory
+
+- name: Upgrade Base Image
+  block:
+    - name: upgrade all packages
+      yum:
+        name: '*'
+        state: latest
+      become: yes
+      register: rpm_upgrade
+      async: 1800
+      poll: 0
+    
+    - name: Wait for upgrade OS
+      async_status: jid="{{ rpm_upgrade.ansible_job_id }}"
+      become: yes
+      register: jobs
+      until: jobs.finished
+      retries: 180
+      delay: 10
+    
+    - name: Clean repo meta data
+      shell: yum clean all; yum reposlit
+      
+    - name: Reboot VMs
+      reboot:    
+      become: yes
+  delegate_to: "{{ hostvars[base_vm_name].ip }}" 
+  

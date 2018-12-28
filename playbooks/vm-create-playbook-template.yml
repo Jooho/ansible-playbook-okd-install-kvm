@@ -1,0 +1,30 @@
+
+- hosts: localhost
+  pre_tasks:
+    - name: Check if base image exist
+      shell: "virsh dominfo {{ base_vm_name }}"
+      register: base_vm_exist
+      ignore_errors: yes 
+    
+  tasks:
+    - name: Import KVM install/base image task
+      import_tasks: kvm_setup.yml
+      when: base_vm_exist is failed
+  
+    # - name: Create VMs for OKD
+    #   import_tasks: ansible-controller/create_vm.yml
+
+    - name: Refresh inventory to ensure new instaces exist in inventory
+      meta: refresh_inventory
+
+    - name: Add ansible controller to memory
+      import_tasks: ansible-controller/generate_host_groups.yml
+        
+    - name: Install DNS 
+      import_role:
+        name: Jooho.dnsmasq_operate
+      vars:
+        dns_ops: "install"
+      delegate_to: "{{ hostvars['ansible_controller']['ip'] }}"
+      when: interim_dns.install
+  

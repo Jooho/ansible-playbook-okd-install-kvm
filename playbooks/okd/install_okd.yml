@@ -1,0 +1,7 @@
+---
+
+- name: Execute prerequisites
+  include: "{{ prequisites_yaml_path }}"
+
+- name: Install OKD
+  include: "{{ okd_install_yaml_path }}"

@@ -1,0 +1,48 @@
+- name: Add masters to host groups
+  add_host:
+    name: "{{ hostvars[item].hostname}}"
+    groups: all_nodes, masters {% if etcd_node_vms is not defined %}, etcd {% endif %}, nodes, broker_sub_nodes
+    openshift_node_group_name: node-config-master
+  with_items: "{{groups['group_' + cluster_tag +'_masters']}}"
+  when: master_node_vms is defined and master_node_vms > 0
+
+- name: Add infra instances to host group
+  add_host:
+    name: "{{ hostvars[item].hostname}}"
+    groups: all_nodes, nodes, infra_nodes, broker_sub_nodes 
+    openshift_node_group_name: node-config-infra
+  with_items: "{{groups['group_' + cluster_tag +'_infra_nodes']}}"
+  when: infra_node_vms is defined and infra_node_vms > 0
+
+
+- name: Add App instances to host group
+  add_host:
+    name: "{{ hostvars[item].hostname}}"
+    groups: all_nodes, nodes, app_nodes, node_sub_nodes 
+    openshift_node_group_name: "{% if infra_node_vms is not defined %}node-config-infra{% else %}node-config-compute{% endif %}"
+  with_items: "{{groups['group_' + cluster_tag +'_app_nodes']}}"
+  when: app_node_vms is defined and app_node_vms > 0
+
+
+- name: Add ETCD instances to host group
+  add_host:
+    name: "{{ hostvars[item].hostname }}"
+    groups: all_nodes, etcd, broker_sub_nodes
+  with_items: "{{groups['group_' + cluster_tag +'_etcd_nodes']}}"
+  when: etcd_node_vms is defined and etcd_node_vms > 0
+
+- name: Add Master instances to ETCD host group
+  add_host:
+    name: "{{ hostvars[item].hostname }}"
+    groups: all_nodes, etcd, broker_sub_nodes
+  with_items: "{{groups['group_' + cluster_tag +'_masters']}}"
+  when: etcd_node_vms is not defined
+
+- name: Add LB instances to host group
+  add_host:
+    name: "{{ hostvars[item].hostname }}"
+    groups: all_nodes, lb, broker_sub_nodes
+    openshift_node_labels:
+      role: lb
+  with_items: "{{groups['group_' + cluster_tag +'_lb_nodes']}}"
+  when: master_node_vms|int > 1 

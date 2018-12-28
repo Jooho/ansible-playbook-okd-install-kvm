@@ -1,0 +1,86 @@
+- name: Add dns record - hostname
+  include_role:
+    name: Jooho.dnsmasq_operate
+  vars:
+    dns_conf_name: "{{ interim_dns.dns_conf_name }}"
+    dns_conf_path: "{{ interim_dns.dns_conf_path }}" 
+    dns_ops: add
+    new_ip: "{{ hostvars[item]['ip'] }}"
+    new_hostname: "{{ hostvars[item]['hostname'] }}" 
+    rewrite_conf: "{{ interim_dns.rewrite_conf}}" 
+  with_items:
+  - "{{ groups[ 'group_' +  cluster_tag  + '_all'] }}"
+
+- name: Add dns record - okd api server/wildcard domain
+  include_role:
+    name: Jooho.dnsmasq_operate
+  vars:
+    dns_conf_name: "{{ interim_dns.dns_conf_name }}"
+    dns_conf_path: "{{ interim_dns.dns_conf_path }}" 
+    dns_ops: add
+    new_ip: "{{ hostvars[item]['ip'] }}"
+    new_hostname: "{{ okd_master_cluster_hostname }}" 
+    rewrite_conf: "{{ interim_dns.rewrite_conf}}" 
+  with_items:
+  - "{{ groups[ 'group_' +  cluster_tag  + '_masters'] }}"
+
+
+- name: Add dns record - okd wildcard domain
+  include_role:
+    name: Jooho.dnsmasq_operate
+  vars:
+    dns_conf_name: "{{ interim_dns.dns_conf_name }}"
+    dns_conf_path: "{{ interim_dns.dns_conf_path }}" 
+    dns_ops: add
+    new_ip: "{{ hostvars[item]['ip'] }}"
+    new_hostname: "{{ okd_cluster_subdomain }}" 
+    rewrite_conf: "{{ interim_dns.rewrite_conf}}" 
+  with_items:
+  - "{{ groups[ 'group_' +  cluster_tag  + '_infra_nodes'] }}"
+
+
+- name: restart NetworkManager
+  systemd:
+      name: NetworkManager # not required. Name of the service. When using in a chroot environment you always need to specify the full name i.e. (crond.service).
+      daemon_reload: yes # not required. run daemon-reload before doing any other operations, to make sure systemd has read any changes.
+      state: restarted # not required. choices: reloaded;restarted;started;stopped. C(started)/C(stopped) are idempotent actions that will not run commands unless necessary. C(restarted) will always bounce the service. C(reloaded) will always reload.
+  become: yes
+
+# - name: Delete Hosts ssh to
+#   known_hosts:
+#     name: "{{ hostvars[item].ip }}"
+#     key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[item].ip }}') }}"
+#     state: absent
+#   with_items:
+#   - "{{ groups[ 'group_' +  cluster_tag  + '_all'] }}"
+
+# - name: tell the host about our servers it might want to ssh to
+#   known_hosts:
+#     name: "{{ hostvars[item].hostname }}"
+#     key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[item].hostname }},{{ hostvars[item].ip }}') }}"
+#   with_items:
+#   - "{{ groups[ 'group_' +  cluster_tag  + '_all'] }}"
+#   register: host_key_add
+#   until: host_key_add is succeeded
+#   ignore_errors: yes
+
+- name: Delete hosts from known_hosts
+  lineinfile:
+    path: "~/.ssh/known_hosts"
+    state: absent
+    regexp: "{{item}}"
+  with_items:
+    - "192.168.200"
+
+- name: Add Known host
+  shell: "ssh-keyscan -t rsa {{ hostvars[item]['hostname'] }},{{ hostvars[item]['ip']}}  >> ~/.ssh/known_hosts"
+  with_items:
+  - "{{ groups[ 'group_' +  cluster_tag  + '_all'] }}"
+  register: add_known_host
+  until: "add_known_host is succeeded and not add_known_host.stderr.find('refused') != -1 and add_known_host.stderr.find('') != -1 "
+  retries: 180
+  delay: 5
+# - name: Add hostname to known_hosts
+#   shell: "ssh -o StrictHostKeyChecking=no centos@{{ hostvars[item]['hostname'] }} -- hostname"
+#   with_items:
+#   - "{{ groups[ 'group_' +  cluster_tag  + '_all'] }}"

@@ -1,0 +1,14 @@
+
+- name: Create ansible controller VM
+  include_role:   
+    name: Jooho.kvm_operate
+  vars:
+    kind: vm
+    operate: clone
+    src_vm: "{{ base_vm_name }}"
+    dest_vm: "ansible_controller"
+    vm_network_br: "{{ kvm.network_br }}"
+    dest_vm_hostname: "ansible-controller.{{ okd_dns_domain }}"    
+    vm_recreate: "{{ okd_vm_recreate }}"
+
+  

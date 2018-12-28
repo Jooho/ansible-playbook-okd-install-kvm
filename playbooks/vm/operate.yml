@@ -1,0 +1,11 @@
+
+- name: Change VM status
+  hosts: localhost
+  tasks:
+    - import_role:
+        name: Jooho.kvm_operate
+      vars:
+        kind: vm
+        prefix_vm: "{{ cluster_tag }}"
+        kvm_install_host: "{{ kvm.install_host }}"
+        # operate: "{{ j_operate }}"

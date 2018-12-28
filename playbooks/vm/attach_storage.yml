@@ -1,0 +1,48 @@
+
+- name: Attach Storage to Master
+  include_role:
+    name: Jooho.kvm_operate
+  vars:
+    kind: storage
+    operate: attach
+    target_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{master_node_prefix}}_{{item}}"
+    disk_size: "{{ okd_docker_storage_size }}"
+  with_sequence:
+    count="{{ master_node_vms }}"
+  when: master_node_vms is defined and master_node_vms > 0  
+    
+- name: Attach Storage to Infra Nodes
+  include_role:
+    name: Jooho.kvm_operate
+  vars:
+    kind: storage
+    operate: attach
+    target_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{infra_node_prefix}}_{{item}}"
+    disk_size: "{{ okd_docker_storage_size }}"
+  with_sequence:
+    count="{{ infra_node_vms }}"
+  when: infra_node_vms is defined and infra_node_vms > 0  
+
+- name: Attach Storage to App Nodes
+  include_role:
+    name: Jooho.kvm_operate
+  vars:
+    kind: storage
+    operate: attach
+    target_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{app_node_prefix}}_{{item}}"
+    disk_size: "{{ okd_docker_storage_size }}"
+  with_sequence:
+    count="{{ app_node_vms }}"
+  when: app_node_vms is defined and app_node_vms > 0    
+
+- name: Attach Storage to ETCD Nodes
+  include_role:
+    name: Jooho.kvm_operate
+  vars:
+    kind: storage
+    operate: attach
+    target_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{etcd_node_prefix}}_{{item}}"
+    disk_size: "{{ okd_docker_storage_size }}"
+  with_sequence:
+    count="{{ etcd_node_vms }}"
+  when: etcd_node_vms is defined and etcd_node_vms > 0  

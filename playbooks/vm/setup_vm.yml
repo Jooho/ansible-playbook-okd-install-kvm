@@ -1,0 +1,73 @@
+---
+
+- name: Setup KVM & Base Image
+  hosts: localhost
+  serial: 1
+  pre_tasks:
+    - debug: var=okd_param_dir
+    - name: Check if base image exist
+      shell: "virsh dominfo {{ base_vm_name }}"
+      register: base_vm_exist
+      ignore_errors: yes 
+
+  tasks:
+    - name: Import KVM install/base image task
+      import_tasks: "../kvm/kvm_setup.yml"
+      when: base_vm_exist is failed
+  
+    - name: Create VMs for OKD
+      import_tasks: create_vms.yml
+
+    - name: Attach storage to cloned VMs for OKD
+      import_tasks: attach_storage.yml
+
+    - name: Refresh inventory to ensure new instaces exist in inventory
+      meta: refresh_inventory
+
+    - name: Gather host group
+      import_tasks: "../okd/generate_host_groups.yml"
+      run_once: yes
+
+    # - name: Refresh inventory to ensure new instaces exist in inventory
+    #   meta: refresh_inventory
+    - name: Config DNS using NetworkManager
+      import_tasks: "../dns/config.yml"
+    
+    - name: Generate ansible hosts file for OKD  
+      import_role:
+        name: Jooho.okd_generate_ansible_hosts      
+
+#hosts: masters{% if (master_node_vms|int > 1) %},lb{% endif %}{% if infra_node_vms is defined and infra_node_vms > 0%},infra_nodes{% endif %},{% if app_node_vms is defined and app_node_vms > 0%},app_nodes{% endif %}
+- name: Install OCP Host Pre-Requisites
+  gather_facts: no
+  hosts: all_nodes
+  pre_tasks:
+    - debug: var=groups
+  tasks:
+    - import_role:
+        name: Jooho.okd_prerequisites
+      vars:
+        node_type: okd-host
+        interim_dns_use: "{{ interim_dns.install }}"
+      when: "inventory_hostname in groups['masters'] or inventory_hostname in groups['nodes'] or inventory_hostname in groups['etcd']"
+    
+    - import_role:
+        name: Jooho.okd_prerequisites
+      vars:
+        node_type: okd-lb
+        interim_dns_use: "{{ interim_dns.install }}"
+      when: "'lb' in groups and inventory_hostname in groups['lb']" 
+  
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Clone OKD Ansible Git Repo
+      git:
+          dest: "{{ okd_ansible_playbook_path }}" # required. The path of where the repository should be checked out. This parameter is required, unless C(clone) is set to C(no).
+          repo: "https://github.com/openshift/openshift-ansible" # required. git, SSH, or HTTP(S) protocol address of the git repository.
+          force: no # not required. If C(yes), any modified files in the working repository will be discarded.  Prior to 0.7, this was always 'yes' and could not be disabled.  Prior to 1.9, the default was `yes`
+          clone: yes # not required. If C(no), do not clone the repository if it does not exist locally
+          update: yes # not required. If C(no), do not retrieve new revisions from the origin repository,Operations like archive will work on the existing (old) repository and might not respond to changes to the options version or remote.
+          remote: origin # not required. Name of the remote.
+          version: "release-{{ okd_version }}" # not required. Add an additional refspec to be fetched. If version is set to a I(SHA-1) not reachable from any branch or tag, this option may be necessary to specify the ref containing the I(SHA-1). Uses the same syntax as the 'git fetch' command. An example value could be "refs/meta/config".
+      become: yes   
