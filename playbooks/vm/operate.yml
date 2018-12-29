@@ -8,4 +8,4 @@
         kind: vm
         prefix_vm: "{{ cluster_tag }}"
         kvm_install_host: "{{ kvm.install_host }}"
-        # operate: "{{ j_operate }}"
+        operate: "{{ j_operate }}"

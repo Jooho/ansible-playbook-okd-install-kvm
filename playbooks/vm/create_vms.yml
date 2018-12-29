@@ -6,13 +6,15 @@
     kind: vm
     operate: clone
     src_vm: "{{ base_vm_name }}"
-    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{master_node_prefix}}_{{item}}"
+    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{master_node_prefix}}_{{num}}"
     vm_network_br: "{{ kvm.network_br }}"
-    dest_vm_hostname: "{{ master_node_prefix }}{{item}}.{{ okd_dns_domain}}"    
+    dest_vm_hostname: "{{ master_node_prefix }}{{num}}.{{ okd_dns_domain}}"    
     vm_recreate: "{{ okd_vm_recreate }}"
     vm_memory: "{{ master_vm_memory }}"
   loop: "{{ range(1,master_node_vms|int + 1,1)|list }}"
-  when: master_node_vms is defined and master_node_vms > 0  
+  loop_control:
+    loop_var: num
+  when: master_node_vms is defined and master_node_vms|int > 0  
 
  
 - name: Create Infra VMs
@@ -22,12 +24,14 @@
     kind: vm
     operate: clone
     src_vm: "{{ base_vm_name }}"
-    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{infra_node_prefix}}_{{item}}"
+    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{infra_node_prefix}}_{{num}}"
     vm_network_br: "{{ kvm.network_br }}"
-    dest_vm_hostname: "{{ infra_node_prefix }}{{item}}.{{ okd_dns_domain}}"    
+    dest_vm_hostname: "{{ infra_node_prefix }}{{num}}.{{ okd_dns_domain}}"    
     vm_recreate: "{{ okd_vm_recreate }}"
     vm_memory: "{{ infra_vm_memory }}"
   loop: "{{ range(1,infra_node_vms|int + 1 ,1)|list }}"
+  loop_control:
+    loop_var: num
   when: infra_node_vms is defined and infra_node_vms > 0  
 
 
@@ -38,12 +42,14 @@
     kind: vm
     operate: clone
     src_vm: "{{ base_vm_name }}"
-    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{app_node_prefix}}_{{item}}"
+    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{app_node_prefix}}_{{num}}"
     vm_network_br: "{{ kvm.network_br }}"
-    dest_vm_hostname: "{{ app_node_prefix }}{{item}}.{{ okd_dns_domain}}"    
+    dest_vm_hostname: "{{ app_node_prefix }}{{num}}.{{ okd_dns_domain}}"    
     vm_recreate: "{{ okd_vm_recreate }}"
     vm_memory: "{{ app_vm_memory }}"
   loop: "{{ range(1,app_node_vms|int + 1,1)|list }}"
+  loop_control:
+    loop_var: num
   when: app_node_vms is defined and app_node_vms > 0  
 
 - name: Create ETCD VMs
@@ -53,12 +59,14 @@
     kind: vm
     operate: clone
     src_vm: "{{ base_vm_name }}"
-    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{etcd_node_prefix}}_{{item}}"
+    dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{etcd_node_prefix}}_{{num}}"
     vm_network_br: "{{ kvm.network_br }}"
-    dest_vm_hostname: "{{ etcd_node_prefix }}{{item}}.{{ okd_dns_domain}}"    
+    dest_vm_hostname: "{{ etcd_node_prefix }}{{num}}.{{ okd_dns_domain}}"    
     vm_recreate: "{{ okd_vm_recreate }}"
     vm_memory: "{{ app_vm_memory }}"
   loop: "{{ range(1,etcd_node_vms|int + 1,1)|list }}"
+  loop_control:
+    loop_var: num
   when: etcd_node_vms is defined and etcd_node_vms > 0  
 
 - name: Create LB VM

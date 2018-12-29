@@ -1,62 +1,66 @@
-# Distinguish Each Cluster
-# tag: 311-1220
-timestamp: "{{ lookup('pipe', 'date +%m%d') }}"
-default_cluster_tag: "{{ okd_short_version }}-{{ timestamp }}"
-cluster_tag: "{{ tag|default(default_cluster_tag) }}"
+Full Demo
+----------
+This show full steps to install OKD from the scratch. Follow all steps and you can see OKD!
 
-# user_home: /home/jooho
+### Environment
+- Fedora 28
+- user `jooho`
 
-# KVM config
-kvm: 
-  log_dir: /tmp/kvm 
-  storage_pool_name: Public
-  storage_pool_dir: /home/jooho/KVM
-  install_host: localhost
-  network_br: okd
+### Pre-requisites
 
+- Install `click` by pip.
+  ```
+  pip install click
+  ```
+- Create user/group
+  ```
+  sudo groupadd libvirt
+  sudo useradd jooho -G libvirt
+  ```
+- Create working directory
+  ```
+  mkdir /home/jooho/git
+  cd /home/jooho/git
+  ```
 
-# Base Image Config
-vm_data_dir: /home/jooho/kvm/vms
-base_vm_name: CentOS_Base
-base_image:
-  os: CentOS
-  version: 7
-  vm_recreate: true
-  cloud_init_vm_image: CentOS-7-x86_64-GenericCloud.qcow2
-  cloud_init_vm_image_link: "https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1809.qcow2"
-  cloud_init_user_data: "{{ vm_data_dir }}/{{ base_vm_name }}/user-data"
-  cloud_init_meta_data: "{{ vm_data_dir }}/{{ base_vm_name }}/meta-data"
-  cloud_init_iso_image: "{{ vm_data_dir }}/{{ base_vm_name }}/cidata.iso"
-  vm_local_hostname: base.example.com
-  vm_hostname: base.example.com
-  vm_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-  vm_cpu: 2
-  vm_memory: 4096
-  vm_root_disk_size: 20G
+- Clone git repository
+  ```
+  git clone https://github.com/Jooho/ansible-playbook-okd-install-kvm.git
+  cd ansible-playbook-okd-install-kvm
+  ```
+  
 
-# Interim DNS
-interim_dns:
-  dns_conf_name: "OKD{{ okd_short_version }}"
-  dns_conf_path: /etc/NetworkManager/dnsmasq.d
-  rewrite_conf: no
-  rewrite_forward_conf: no
-  install: false
-  install_host: localhost
-  #forwarder_dns:
-  #  - 8.8.8.8
+### Deploy OKD
 
+- Update variable
+  ```
+  vi vars/all
+  
+  # Distinguish Each Cluster
+  tag: 311-1220   # <== update
+  
+  # KVM config
+  kvm: 
+    ..
+    storage_pool_dir: /home/jooho/KVM    <== update or delete (default: /var/lib/libvirt/images)
+    ..
 
-# OKD
+  
+  # Base Image Config
+  vm_data_dir: /home/jooho/kvm/vms    <== update or delete (default: /root/kvm/vms)
 
-okd_param_dir: "{{ current_path }}/vars"
-okd_version: 3.11      
-okd_short_version: "{{ okd_version|regex_replace('\\.')}}"
-okd_docker_version: 1.13.1  
-okd_docker_storage_size: 20G 
-okd_docker_storage_disk: vdb       
-okd_interim_dns_use: true
-okd_interim_dns_ip: 192.168.200.1
-okd_dns_domain: example.com
+ 
+  # OKD
+  
+  okd_param_dir: "{{ current_path }}/vars"
+  okd_version: 3.11      
+  okd_short_version: "{{ okd_version|regex_replace('\\.')}}"
+  okd_docker_version: 1.13.1  
+  okd_docker_storage_size: 20G 
+  okd_docker_storage_disk: vdb       
+  okd_interim_dns_use: true
+  okd_interim_dns_ip: 192.168.200.1
+  okd_dns_domain: example.com
 okd_cluster_subdomain: "cloudapps-{{cluster_tag}}.{{okd_dns_domain}}"
 okd_master_cluster_hostname: "masters-{{cluster_tag}}.{{okd_dns_domain}}"
 okd_vm_recreate: false
@@ -106,3 +110,9 @@ management_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift
 descheduler_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-descheduler/config.yml"
 node_problem_detector_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-node-problem-detector/config.yml"
 autoheal_install_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-autoheal/config.yml"
+
+  ```
+- Deploy OKD
+  ```
+  ./jkit.py --op=deploy -vvvv
+  ```

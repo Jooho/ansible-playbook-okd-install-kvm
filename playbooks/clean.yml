@@ -34,7 +34,7 @@
 
     - name: Delete hosts from known_hosts
       lineinfile:
-        path: "{{ user_home }}/.ssh/known_hosts"
+        path: "~/.ssh/known_hosts"
         state: absent
         regexp: "{{item}}"
       with_items:

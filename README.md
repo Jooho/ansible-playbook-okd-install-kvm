@@ -32,19 +32,14 @@ This script help deploy OKD on KVM and also provide some more features for refer
 ## Docs
 
 - [JKIT CLI](./docs/jkit.md)
- 
-### Playbook Information
-
-- [Directory Structure](./docs/directory_structure.md)
- 
+  
 ### Tested Scripts
 
 - [Tested Features](./docs/tested_scripts.md)
-
-
-
 - Generate key pair for SSH
-- [Update all.yml](./doc/update-variables.md)
+
+### Demo
+- [Full Demo from scratch](./doc/full_demo.md)
 
 
 

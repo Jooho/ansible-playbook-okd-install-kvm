@@ -26,7 +26,11 @@ pip2 install click
 - operate `deploy`
   - KVM install
   - VM creation 
-  - Execute Prerequisites for OKD
+  - Prerequisites
+    - Install neccessary packages
+    - Docker
+    - etc
+  - Execute Prerequisites playbook by official OKD ansible playbook
   - Install OKD
 
 ```
@@ -36,13 +40,17 @@ pip2 install click
 - operate `provision`
   - KVM install
   - VM creation 
-  - Execute Prerequisites for OKD
+  - Prerequisites
+    - Install neccessary packages
+    - Docker
+    - etc
 
 ```
 ./jkit.py --op=provision
 ```
 
 - operate `install`
+  - Execute Prerequisites playbook by official OKD ansible playbook
   - Install OKD 
   - If you already have VM or if you encounted any issues during OKD installation
   
@@ -50,7 +58,7 @@ pip2 install click
 ./jkit.py --op=install
 ```
 
-- operate `start/stop/teardown`
+- operate `start/stop/suspend/destroy/teardown`
   - start/stop 
   - vm status
   - teardown
@@ -60,5 +68,5 @@ pip2 install click
 
 
 ```
-./jkit.py --op=[start,stop,teardown] --tag=test
+./jkit.py --op=[start,stop,suspend,destroy,teardown] --tag=test
 ```

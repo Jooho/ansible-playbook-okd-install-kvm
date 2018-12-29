@@ -46,7 +46,7 @@ def launch(provider=None,
         verbosity = ''
 
 # Create variable list to overwrite
-    all_variables_str= ["tag","operate"]
+    all_variables_str= ["tag","j_operate"]
     all_variables_real= [tag, op]
     overwrite_variables=[]
     var_index=0

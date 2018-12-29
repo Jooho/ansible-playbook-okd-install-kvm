@@ -51,7 +51,7 @@
       delay: 10
     
     - name: Clean repo meta data
-      shell: yum clean all; yum reposlit
+      shell: yum clean all; yum repolist
       
     - name: Reboot VMs
       reboot:    

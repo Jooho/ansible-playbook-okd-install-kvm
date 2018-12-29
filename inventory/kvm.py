@@ -77,11 +77,14 @@ def create_connection():
 
     # Create a connection with options defined in ini file:
     url = config.get('libvirt', 'libvirt_connection_url')
-    conn = libvirt.open(url)
+    try:
+        conn = libvirt.open(url)
+        if conn == None:
+           print("Failed to open connection to %s" % (url), file=sys.stderr)
+           exit(1)
+    except:
+         return None
 
-    if conn == None:
-      print("Failed to open connection to %s" % (url), file=sys.stderr)
-      exit(1)
     return conn
 
 
@@ -160,12 +163,18 @@ def get_dict_of_struct(connection, target_vm_name):
 
     return data
 
-
-
 def get_data(connection, target_vm_name=None):
     """
     Obtain data of `target_vm_name` if specified, otherwise obtain data of all vms.
     """
+
+    if connection == None:
+        data = defaultdict(list)
+        data["_meta"] = {
+            'hostvars': []
+        }
+        return data
+
     all_vms_name_list = connection.listAllDomains()
     active_vms_id_list = connection.listDomainsID()
     active_vms_name_list = []
