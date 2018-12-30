@@ -45,13 +45,8 @@ This show full steps to install OKD from the scratch. Follow all steps and you c
     storage_pool_dir: /home/jooho/KVM    <== update or delete (default: /var/lib/libvirt/images)
     ..
 
-  
   # Base Image Config
   vm_data_dir: /home/jooho/kvm/vms    <== update or delete (default: /root/kvm/vms)
-
- 
-  # OKD
-  
 
   okd_version: 3.11      # <=== update if version need to be changed
   okd_docker_version: 1.13.1  # <=== update if OKD version need to be changed
@@ -71,6 +66,17 @@ This show full steps to install OKD from the scratch. Follow all steps and you c
   app_node_prefix: app
   etcd_node_prefix: etcd
   lb_node_prefix: lb
+  ```
+
+  vi vars/okd_param.yml
+  ```
+  openshift_logging_install_logging: false  # <== logging need enough memory so when you create vm with more than 6G,please set true
+                                            # By default it is false
+  ```
+
+- Download Ansible Galaxy Roles
+  ```
+  ansible-galaxy install -f -r requirements.yml
   ```
 
 - Deploy OKD

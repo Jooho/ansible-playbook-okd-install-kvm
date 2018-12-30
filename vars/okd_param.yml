@@ -56,7 +56,7 @@ openshift_metrics_storage_kind: dynamic
 openshift_metrics_storage_volume_size: 5Gi
 
 # Logging
-openshift_logging_install_logging: true
+openshift_logging_install_logging: false
 openshift_logging_es_nodeselector: {"node-role.kubernetes.io/infra": "true"}
 openshift_logging_storage_kind: dynamic
 openshift_logging_es_pvc_dynamic: true

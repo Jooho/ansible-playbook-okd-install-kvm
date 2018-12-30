@@ -14,7 +14,7 @@
     name: Jooho.kvm_cloud_init_vm
   vars:
     kvm_install_host: "{{ kvm.install_host }}"
-    kvm_vm_pool_dir: "{{ kvm.storage_pool_dir }}"
+    kvm_vm_pool_dir: "{{ kvm.storage_pool_dir |default('/var/lib/libvirt/images')}}"
     vm_network_br: "{{ kvm.network_br }}"     
     vm_data_dir: "{{ vm_data_dir }}"
     vm_recreate: "{{ base_image.vm_recreate }}"
