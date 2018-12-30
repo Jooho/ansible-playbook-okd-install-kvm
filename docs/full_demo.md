@@ -4,7 +4,7 @@ This show full steps to install OKD from the scratch. Follow all steps and you c
 
 ### Environment
 - Fedora 28
-- user `jooho`
+- user `root`
 
 ### Pre-requisites
 
@@ -12,15 +12,11 @@ This show full steps to install OKD from the scratch. Follow all steps and you c
   ```
   pip install click
   ```
-- Create user/group
-  ```
-  sudo groupadd libvirt
-  sudo useradd jooho -G libvirt
-  ```
+
 - Create working directory
   ```
-  mkdir /home/jooho/git
-  cd /home/jooho/git
+  mkdir /tmp/Test
+  cd /tmp/Test
   ```
 
 - Clone git repository
