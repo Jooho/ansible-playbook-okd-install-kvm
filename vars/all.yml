@@ -1,5 +1,5 @@
 # Distinguish Each Cluster
-# tag: 311-1220
+tag: 311-1220
 timestamp: "{{ lookup('pipe', 'date +%m%d') }}"
 default_cluster_tag: "{{ okd_short_version }}-{{ timestamp }}"
 cluster_tag: "{{ tag|default(default_cluster_tag) }}"
@@ -30,7 +30,7 @@ base_image:
   vm_local_hostname: base.example.com
   vm_hostname: base.example.com
   vm_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-  vm_cpu: 2
+  vm_cpu: 3
   vm_memory: 4096
   vm_root_disk_size: 20G
 
