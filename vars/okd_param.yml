@@ -7,7 +7,7 @@ osm_use_cockpit: true
 openshift_disable_check: disk_availability,memory_availability
 dynamic_volumes_check: False
 openshift_enable_unsupported_configurations: True
-openshift_release: "v{{ okd_version }}"
+openshift_release: "{{ okd_version }}"
 openshift_deployment_type: origin
 docker_version: "{{ okd_docker_version }}"
 

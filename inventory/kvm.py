@@ -20,7 +20,6 @@ try:
 except ImportError:
     import simplejson as json
 
-
 def parse_args():
     """
     Create command line parser for libvirt dynamic inventory script.
@@ -72,7 +71,6 @@ def create_connection():
     """
     Create a connection to libvirt engine API.
     """
-
     config = load_config_file()
 
     # Create a connection with options defined in ini file:
@@ -86,7 +84,6 @@ def create_connection():
          return None
 
     return conn
-
 
 def get_dict_of_struct(connection, target_vm_name):
 
@@ -113,7 +110,6 @@ def get_dict_of_struct(connection, target_vm_name):
         _state = 'PMSUSPENDED'
     else:
         _state = 'UNKNOWN'
-
 
     if _state == 'RUNNING':
         # VM Network interface
@@ -216,14 +212,12 @@ def get_data(connection, target_vm_name=None):
                     data['group_%s_etcd_nodes' % okd_version].append(vm.name())
                 if 'lb' in vm.name():
                     data['group_%s_lb_nodes' % okd_version].append(vm.name())
-
         data["_meta"] = {
             'hostvars': vms,
         }
 
     return data
-
-
+ 
 def main():
     args = parse_args()
     connection = create_connection()

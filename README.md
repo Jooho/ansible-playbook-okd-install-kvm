@@ -39,8 +39,4 @@ This script help deploy OKD on KVM and also provide some more features for refer
 - Generate key pair for SSH
 
 ### Demo
-- [Full Demo from scratch](./doc/full_demo.md)
-
-
-
-
+- [Full Demo from scratch](./docs/full_demo.md)

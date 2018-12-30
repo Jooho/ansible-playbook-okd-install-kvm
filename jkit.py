@@ -107,7 +107,6 @@ def launch(provider=None,
            status = os.system(
                 'ansible-playbook %s -i /etc/ansible/hosts playbooks/okd/install_okd.yml \
                 --extra-vars "@vars/all.yml" \
-                --extra-vars "@vars/okd_param.yml" \
                 -e "%s"  --flush-cache'
 
                 % (verbosity, sio.getvalue())
