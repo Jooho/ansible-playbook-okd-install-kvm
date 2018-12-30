@@ -31,7 +31,7 @@ This script help deploy OKD on KVM and also provide some more features for refer
 
 ## Docs
 
-- [JKIT CLI](./docs/jkit.md)
+- [JKIT CLI](./docs/jkit_cli.md)
   
 ### Tested Scripts
 
