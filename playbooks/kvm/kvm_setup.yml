@@ -33,7 +33,7 @@
 
 - name: Upgrade Base Image
   block:
-    - name: upgrade all packages
+    - name: Upgrade all packages
       yum:
         name: '*'
         state: latest
