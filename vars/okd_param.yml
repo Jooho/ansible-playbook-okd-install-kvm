@@ -1,6 +1,6 @@
 # OKD Cluster
 ansible_ssh_user: centos
-#ansible_become: true
+ansible_become: true
 debug_level: 2
 containerized: false
 osm_use_cockpit: true
