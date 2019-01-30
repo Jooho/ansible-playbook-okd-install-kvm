@@ -18,7 +18,7 @@
      
     - name: Gather files under KVM storage pool path
       find: 
-        paths: "{{ kvm.storage_pool_dir }}"
+        paths: "{{ kvm.storage_pool_dir |default('/var/lib/libvirt/images') }}"
         patterns: "{{ cluster_tag }}*"
       become: yes
       register: vm_images_list

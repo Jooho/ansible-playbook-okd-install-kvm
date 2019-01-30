@@ -1,0 +1,78 @@
+# OKD Cluster
+ansible_ssh_user: centos
+ansible_become: true
+debug_level: 2
+containerized: false
+osm_use_cockpit: true
+openshift_disable_check: disk_availability,memory_availability
+dynamic_volumes_check: False
+openshift_enable_unsupported_configurations: True
+openshift_release: "{{ okd_version }}"
+openshift_deployment_type: origin
+docker_version: "{{ okd_docker_version }}"
+
+# Cluster
+openshift_master_default_subdomain: "{{okd_cluster_subdomain}}"
+openshift_master_cluster_hostname: "masters-{{cluster_tag}}.{{okd_dns_domain}}"
+openshift_master_cluster_public_hostname: "{% if 'lb' in groups%}{{groups['lb'][0]}}{% else %}masters-{{cluster_tag}}.{{okd_dns_domain}}{% endif %}"
+openshift_master_cluster_method: "native"
+osm_default_node_selector: "node-role.kubernetes.io/compute=true"
+
+# Enable API service auditing
+#openshift_master_audit_config: {"enabled": true, "auditFilePath": "/etc/origin/master/openpaas-oscp-audit.log", "maximumFileRetentionDays": 14, "maximumFileSizeMegabytes": 500, "maximumRetainedFiles": 5}
+openshift_master_audit_config: {"enabled": true}
+
+# Docker
+openshift_docker_options: '--log-driver=json-file --signature-verification=False --selinux-enabled --log-opt max-size=1M --log-opt max-file=3 -l warn --ipv6=false'
+
+# Identity
+#openshift_master_identity_providers: [{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+openshift_master_identity_providers: [{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+openshift_master_htpasswd_users: {'joe': '$apr1$e/IdW2fy$C81mY.UvlYLTjbsg3zvG./', 'sue': '$apr1$WnnI.8Ce$KDA5pr/UsmS3wtL5lEr7d/'}
+
+
+# Networking
+os_sdn_network_plugin_name: "redhat/openshift-ovs-multitenant"
+openshift_portal_net: "172.30.0.0/16"
+osm_cluster_network_cidr: "10.128.0.0/14"
+osm_host_subnet_length: "8"
+
+# Registry
+# Validity of the auto-generated certificate in days (optional)
+openshift_hosted_registry_selector: 'node-role.kubernetes.io/infra=true'
+openshift_hosted_registry_cert_expire_days: 730
+cli_docker_additional_registries: registry.access.redhat.com
+cli_docker_insecure_registries: 172.30.0.0/16
+openshift_hosted_registry_replicas: 1
+
+# Router
+openshift_hosted_router_selector: 'node-role.kubernetes.io/infra=true'
+
+
+# Metrics
+openshift_metrics_install_metrics: true
+openshift_metrics_cassandra_storage_type: dynamic
+openshift_metrics_storage_kind: dynamic
+openshift_metrics_storage_volume_size: 5Gi
+
+# Logging
+openshift_logging_install_logging: false
+openshift_logging_es_nodeselector: {"node-role.kubernetes.io/infra": "true"}
+openshift_logging_storage_kind: dynamic
+openshift_logging_es_pvc_dynamic: true
+openshift_logging_es_memory_limit: 4G
+openshift_logging_storage_volume_size: 5Gi
+
+
+# Prometheus
+openshift_hosted_prometheus_deploy: true
+openshift_prometheus_node_selector: {"node-role.kubernetes.io/compute":"true"}
+
+
+# master environments.
+openshift_master_api_env_vars: {"ENABLE_HTTP2": "true"}
+openshift_master_controllers_env_vars: {"ENABLE_HTTP2": "true"}
+openshift_node_env_vars: {"ENABLE_HTTP2": "true"}
+
+# node group
+openshift_node_groups: [{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true', 'role=master','region=mgmt']}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true','role=infra','region=infra','zone=default']}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true', 'role=app','region=app', 'zone=default'], 'edits': [{ 'key': 'kubeletArguments.pods-per-core','value': ['20']}]}]

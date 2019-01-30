@@ -6,8 +6,8 @@
   vars:
     kvm_install_host: "{{ kvm.install_host }}"
     kvm_log_dir: "{{ kvm.log_dir }}"
-    kvm_storage_pool_dir: "{{ kvm.storage_pool_dir }}"
-    kvm_storage_pool_name: "{{ kvm.storage_pool_name }}"  
+    kvm_storage_pool_dir: "{{ kvm.storage_pool_dir | default('/var/lib/libvirt/images')}}"
+    kvm_storage_pool_name: "{{ kvm.storage_pool_name | default('default') }}"  
 
 - name: Deploy base image
   import_role:

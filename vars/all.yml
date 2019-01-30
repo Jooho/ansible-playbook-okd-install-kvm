@@ -1,5 +1,5 @@
 # Distinguish Each Cluster
-tag: 311-1220
+tag: 311-0129
 timestamp: "{{ lookup('pipe', 'date +%m%d') }}"
 default_cluster_tag: "{{ okd_short_version }}-{{ timestamp }}"
 cluster_tag: "{{ tag|default(default_cluster_tag) }}"
@@ -9,8 +9,6 @@ cluster_tag: "{{ tag|default(default_cluster_tag) }}"
 # KVM config
 kvm: 
   log_dir: /tmp/kvm 
-  storage_pool_name: Public
-  storage_pool_dir: /home/jooho/KVM
   install_host: localhost
   network_br: okd
 
@@ -81,6 +79,10 @@ app_node_prefix: app
 etcd_node_prefix: etcd
 lb_node_prefix: lb
 
+
+# NFS
+nfs_mount_point: no_nfs
+nfs_server_ip: no_nfs
 
 # Do not change
 prometheus_yaml_path: "{{okd_ansible_playbook_path}}/playbooks/openshift-prometheus/config.yml"

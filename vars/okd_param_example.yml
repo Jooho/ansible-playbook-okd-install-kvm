@@ -59,14 +59,14 @@ osm_host_subnet_length: "8"
 #openshift_registry_selector: 'region=infra'
 openshift_hosted_registry_selector: 'node-role.kubernetes.io/infra=true'
 openshift_hosted_registry_cert_expire_days: 730
-openshift_hosted_registry_storage_kind: nfs
-openshift_hosted_registry_storage_access_modes: ['ReadWriteMany']
-openshift_hosted_registry_storage_host: "{{nfs_server_ip}}"
+#openshift_hosted_registry_storage_kind: nfs
+#openshift_hosted_registry_storage_access_modes: ['ReadWriteMany']
+#openshift_hosted_registry_storage_host: "{{nfs_server_ip}}"
 # nfs_directory must conform to DNS-1123 subdomain must consist of lower case
 # alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character
-openshift_hosted_registry_storage_nfs_directory: "{{nfs_mount_point}}"
-openshift_hosted_registry_storage_volume_name: registry
-openshift_hosted_registry_storage_volume_size: 5Gi
+#openshift_hosted_registry_storage_nfs_directory: "{{nfs_mount_point}}"
+#openshift_hosted_registry_storage_volume_name: registry
+#openshift_hosted_registry_storage_volume_size: 5Gi
 cli_docker_additional_registries: registry.access.redhat.com
 cli_docker_insecure_registries: 172.30.0.0/16
 openshift_hosted_registry_replicas: 2
@@ -79,8 +79,8 @@ openshift_hosted_router_selector: 'node-role.kubernetes.io/infra=true'
 # Metrics
 openshift_metrics_install_metrics: true
 openshift_metrics_cassandra_storage_type: dynamic
-openshift_metrics_storage_kind: dynamic
-openshift_metrics_storage_volume_size: 5Gi
+#openshift_metrics_storage_kind: dynamic
+#openshift_metrics_storage_volume_size: 5Gi
 #openshift_metrics_image_version: v3.11
 #openshift_metrics_storage_kind: nfs
 #openshift_metrics_storage_access_modes: ['ReadWriteOnce']
@@ -98,7 +98,7 @@ openshift_metrics_storage_volume_size: 5Gi
 
 
 # Logging
-openshift_logging_install_logging: true
+openshift_logging_install_logging: false
 openshift_logging_storage_kind: dynamic
 openshift_logging_es_pvc_dynamic: true
 openshift_logging_es_memory_limit: 4G
@@ -123,47 +123,47 @@ openshift_logging_es_nodeselector: {"node-role.kubernetes.io/infra": "true"}
 
 
 # Prometheus
-openshift_hosted_prometheus_deploy: true
-openshift_prometheus_node_selector: {"node-role.kubernetes.io/compute":"true"}
+#openshift_hosted_prometheus_deploy: true
+#openshift_prometheus_node_selector: {"node-role.kubernetes.io/compute":"true"}
 #openshift_prometheus_node_selector: {"region": "app"}
-openshift_prometheus_storage_kind: nfs
-openshift_prometheus_storage_access_modes: ['ReadWriteOnce']
-openshift_prometheus_storage_host: "{{nfs_server_ip}}"
-openshift_prometheus_storage_nfs_directory: "{{nfs_mount_point}}"
-openshift_prometheus_storage_volume_name: prometheus
-openshift_prometheus_storage_volume_size: 5Gi
+#openshift_prometheus_storage_kind: nfs
+#openshift_prometheus_storage_access_modes: ['ReadWriteOnce']
+#openshift_prometheus_storage_host: "{{nfs_server_ip}}"
+#openshift_prometheus_storage_nfs_directory: "{{nfs_mount_point}}"
+#openshift_prometheus_storage_volume_name: prometheus
+#openshift_prometheus_storage_volume_size: 5Gi
 #openshift_prometheus_storage_labels: {'storage': 'prometheus'}
-openshift_prometheus_storage_type: 'pvc'
-openshift_prometheus_storage_class: managed-nfs-storage
+#openshift_prometheus_storage_type: 'pvc'
+#openshift_prometheus_storage_class: managed-nfs-storage
 # For prometheus-alertmanager
-openshift_prometheus_alertmanager_storage_kind: nfs
-openshift_prometheus_alertmanager_storage_access_modes: ['ReadWriteOnce']
-openshift_prometheus_alertmanager_storage_host: "{{nfs_server_ip}}"
-openshift_prometheus_alertmanager_storage_nfs_directory: "{{nfs_mount_point}}"
-openshift_prometheus_alertmanager_storage_volume_name: prometheus-alertmanager
-openshift_prometheus_alertmanager_storage_volume_size: 5Gi
-#openshift_prometheus_alertmanager_storage_labels: {'storage': 'prometheus-alertmanager'}
-openshift_prometheus_alertmanager_storage_type: 'pvc'
-openshift_prometheus_alertmanager_storage_class: managed-nfs-storage
-# For prometheus-alertbuffer
-openshift_prometheus_alertbuffer_storage_kind: nfs
-openshift_prometheus_alertbuffer_storage_access_modes: ['ReadWriteOnce']
-openshift_prometheus_alertbuffer_storage_host: "{{nfs_server_ip}}"
-openshift_prometheus_alertbuffer_storage_nfs_directory: "{{nfs_mount_point}}"
-openshift_prometheus_alertbuffer_storage_volume_name: prometheus-alertbuffer
-openshift_prometheus_alertbuffer_storage_volume_size: 5Gi
-#openshift_prometheus_alertbuffer_storage_labels: {'storage': 'prometheus-alertbuffer'}
-openshift_prometheus_alertbuffer_storage_type: 'pvc'
-openshift_prometheus_alertbuffer_storage_class: managed-nfs-storage
+#openshift_prometheus_alertmanager_storage_kind: nfs
+#openshift_prometheus_alertmanager_storage_access_modes: ['ReadWriteOnce']
+#openshift_prometheus_alertmanager_storage_host: "{{nfs_server_ip}}"
+#openshift_prometheus_alertmanager_storage_nfs_directory: "{{nfs_mount_point}}"
+#openshift_prometheus_alertmanager_storage_volume_name: prometheus-alertmanager
+#openshift_prometheus_alertmanager_storage_volume_size: 5Gi
+##openshift_prometheus_alertmanager_storage_labels: {'storage': 'prometheus-alertmanager'}
+#openshift_prometheus_alertmanager_storage_type: 'pvc'
+#openshift_prometheus_alertmanager_storage_class: managed-nfs-storage
+## For prometheus-alertbuffer
+#openshift_prometheus_alertbuffer_storage_kind: nfs
+#openshift_prometheus_alertbuffer_storage_access_modes: ['ReadWriteOnce']
+#openshift_prometheus_alertbuffer_storage_host: "{{nfs_server_ip}}"
+#openshift_prometheus_alertbuffer_storage_nfs_directory: "{{nfs_mount_point}}"
+#openshift_prometheus_alertbuffer_storage_volume_name: prometheus-alertbuffer
+#openshift_prometheus_alertbuffer_storage_volume_size: 5Gi
+##openshift_prometheus_alertbuffer_storage_labels: {'storage': 'prometheus-alertbuffer'}
+#openshift_prometheus_alertbuffer_storage_type: 'pvc'
+#openshift_prometheus_alertbuffer_storage_class: managed-nfs-storage
 
 # CFME project
-openshift_management_project: openshift-management
-openshift_management_project_description: CloudForms Management Engine
-openshift_management_nodeselector: 'node-role.kubernetes.io/infra=true'
-openshift_management_app_template: cfme-template
-#openshift_management_storage_class: nfs_external
-openshift_management_install_management: false
-openshift_management_template_parameters: {'APPLICATION_MEM_REQ': '3000Mi', 'POSTGRESQL_MEM_REQ': '1Gi', 'ANSIBLE_MEM_REQ': '512Mi', 'APPLICATION_VOLUME_CAPACITY': '5Gi', 'DATABASE_VOLUME_CAPACITY': '10Gi'}
+#openshift_management_project: openshift-management
+#openshift_management_project_description: CloudForms Management Engine
+#openshift_management_nodeselector: 'node-role.kubernetes.io/infra=true'
+#openshift_management_app_template: cfme-template
+##openshift_management_storage_class: nfs_external
+#openshift_management_install_management: false
+#openshift_management_template_parameters: {'APPLICATION_MEM_REQ': '3000Mi', 'POSTGRESQL_MEM_REQ': '1Gi', 'ANSIBLE_MEM_REQ': '512Mi', 'APPLICATION_VOLUME_CAPACITY': '5Gi', 'DATABASE_VOLUME_CAPACITY': '10Gi'}
 #openshift_management_storage_nfs_external_hostname: "{{nfs_server_ip}}"
 #openshift_management_storage_nfs_base_dir: "{{nfs_mount_point}}"
 
