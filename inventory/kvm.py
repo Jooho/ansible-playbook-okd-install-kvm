@@ -118,9 +118,10 @@ def get_dict_of_struct(connection, target_vm_name):
         for (name, val) in ifaces.iteritems():
             if val['addrs']:
                 for ipaddr in val['addrs']:
-                    if ipaddr['type'] == libvirt.VIR_IP_ADDR_TYPE_IPV4 and ipaddr['addr'] != '127.0.0.1':
+                    if ipaddr['type'] == libvirt.VIR_IP_ADDR_TYPE_IPV4 and ipaddr['addr'] != '127.0.0.1' and ipaddr['addr'] == '192.168.200.1':
                         vm_ip = ipaddr['addr']
 
+          
         # Hostname
         cmd = subprocess.Popen("ssh -o StrictHostKeyChecking=no  centos@%s -- hostname" %(vm_ip), shell=True, stdout=subprocess.PIPE)
         #cmd = subprocess.Popen("host 1.8.8.8", shell=True, stdout=subprocess.PIPE)
