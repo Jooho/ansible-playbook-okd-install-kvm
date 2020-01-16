@@ -55,9 +55,9 @@ def load_config_file():
     config_path = os.environ.get('LIBVIRT_INI_PATH', default_path)
 
     # Create parser and add ovirt section if it doesn't exist:
-    config = configparser.SafeConfigParser(
+    config = configparser.ConfigParser(
         defaults={
-            'libvirt_connection_url': None
+            'libvirt_connection_url': 'None'
         }
     )
     if not config.has_section('libvirt'):
@@ -115,11 +115,13 @@ def get_dict_of_struct(connection, target_vm_name):
         # VM Network interface
         ifaces = vm.interfaceAddresses(libvirt.VIR_DOMAIN_INTERFACE_ADDRESSES_SRC_AGENT, 0)
         vm_ip=''
-        for (name, val) in ifaces.iteritems():
+        for (name, val) in ifaces.items():
             if val['addrs']:
                 for ipaddr in val['addrs']:
-                    if ipaddr['type'] == libvirt.VIR_IP_ADDR_TYPE_IPV4 and ipaddr['addr'] != '127.0.0.1' and ipaddr['addr'] == '192.168.200.1':
+                    # print("ipaddr=%s" %(ipaddr))
+                    if ipaddr['type'] == libvirt.VIR_IP_ADDR_TYPE_IPV4 and ipaddr['addr'] != '127.0.0.1' and ipaddr['addr'].find('192.168.200') != -1:
                         vm_ip = ipaddr['addr']
+                        #print("vm_ip=%s" %(vm_ip))
 
           
         # Hostname
@@ -129,7 +131,7 @@ def get_dict_of_struct(connection, target_vm_name):
 
         for line in cmd.stdout:
             vm_hostname = line[:-1]
-
+            
         # For reference
         #  for line in cmd.stdout:
         #    if "pointer" in line:
@@ -147,7 +149,7 @@ def get_dict_of_struct(connection, target_vm_name):
              'cpu': str(vm.info()[3]),
              'max_cpu': str(vm.maxVcpus()),
              'ip': vm_ip,
-             'hostname': vm_hostname
+             'hostname': vm_hostname.decode("utf-8")
          }
     else:
         data={
@@ -230,9 +232,10 @@ def main():
                 target_vm_name=args.host,
             ),
             sort_keys=args.pretty,
-            indent=args.pretty * 2,
+            indent=args.pretty*2,
         )
     )
+
 
 if __name__ == '__main__':
     main()
