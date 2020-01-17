@@ -3,7 +3,7 @@
 import click
 import os
 import sys
-from StringIO import StringIO
+from io import StringIO
 
 @click.command()
 @click.option('--provider',
@@ -37,7 +37,7 @@ def launch(provider=None,
     # validate okd deploy_type options
     if deploy_type == 'okd':
         if op not in ['deploy', 'start', 'stop', 'teardown', 'install', 'provision']:
-            print "[Not Valid Operate] - '%s' only allowed for okd" %op
+            print ("[Not Valid Operate] - '%s' only allowed for okd" % op)
             sys.exit(1)
 
     if verbose > 0:
@@ -63,7 +63,7 @@ def launch(provider=None,
         var_index += 1
     overwrite_variables.append("current_path="+os.getcwd())
     sio.write(' '.join(overwrite_variables))
-    print sio.getvalue()
+    print (sio.getvalue())
 
 # Construct ansible command
     if deploy_type == 'okd':
