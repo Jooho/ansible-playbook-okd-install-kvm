@@ -8,6 +8,7 @@
     new_ip: "{{ hostvars[item]['ip'] }}"
     new_hostname: "{{ hostvars[item]['hostname'] }}" 
     rewrite_conf: "{{ interim_dns.rewrite_conf}}" 
+    dnsmasq_status: "{% if interim_dns.use_dnsmasq == true %}restarted{% else %}stopped{% endif %}"
   with_items:
   - "{{ groups[ 'group_' +  cluster_tag  + '_all'] }}"
 
@@ -21,6 +22,7 @@
     new_ip: "{{ hostvars[item]['ip'] }}"
     new_hostname: "{{ okd_master_cluster_hostname }}" 
     rewrite_conf: "{{ interim_dns.rewrite_conf}}" 
+    dnsmasq_status: "{% if interim_dns.use_dnsmasq == true %}restarted{% else %}stopped{% endif %}"
   with_items:
   - "{{ groups[ 'group_' +  cluster_tag  + '_masters'] }}"
 
@@ -35,15 +37,16 @@
     new_ip: "{{ hostvars[item]['ip'] }}"
     new_hostname: "{{ okd_cluster_subdomain }}" 
     rewrite_conf: "{{ interim_dns.rewrite_conf}}" 
+    dnsmasq_status: "{% if interim_dns.use_dnsmasq == true %}restarted{% else %}stopped{% endif %}"
   with_items:
   - "{{ groups[ 'group_' +  cluster_tag  + '_infra_nodes'] }}"
 
 
-- name: restart NetworkManager
+- name: Reload NetworkManager
   systemd:
       name: NetworkManager # not required. Name of the service. When using in a chroot environment you always need to specify the full name i.e. (crond.service).
       daemon_reload: yes # not required. run daemon-reload before doing any other operations, to make sure systemd has read any changes.
-      state: restarted # not required. choices: reloaded;restarted;started;stopped. C(started)/C(stopped) are idempotent actions that will not run commands unless necessary. C(restarted) will always bounce the service. C(reloaded) will always reload.
+      state: reloaded # not required. choices: reloaded;restarted;started;stopped. C(started)/C(stopped) are idempotent actions that will not run commands unless necessary. C(restarted) will always bounce the service. C(reloaded) will always reload.
   become: yes
 
 # - name: Delete Hosts ssh to
