@@ -10,6 +10,16 @@
       register: base_vm_exist
       ignore_errors: yes 
 
+    - virt:
+        command: list_vms
+      register: vm_names
+
+    - fail:
+        msg="VM({{item}}) has {{cluster_tag}} and okd_vm_recreate(./var/all.yml) is false"
+      when: item |regex_search(cluster_tag)
+      with_items:
+      - "{{ vm_names.list_vms }}"
+
   tasks:
     - name: Import KVM install/base image task
       import_tasks: "../kvm/kvm_setup.yml"

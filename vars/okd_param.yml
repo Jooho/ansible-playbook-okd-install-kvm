@@ -15,11 +15,9 @@ docker_version: "{{ okd_docker_version }}"
 # Cluster
 openshift_master_default_subdomain: "{{okd_cluster_subdomain}}"
 openshift_master_cluster_hostname: "masters-{{hostvars['localhost'].cluster_tag}}.{{okd_dns_domain}}"
-openshift_master_cluster_public_hostname: "{% if 'lb' in groups%}{{groups['lb'][0]}}{% else %}{{openshift_master_cluster_hostname}}{% endif %}"
+openshift_master_cluster_public_hostname: "{% if 'lb' in groups%}{{groups['lb'][0]}}{% else %}masters-{{cluster_tag}}.{{okd_dns_domain}}{% endif %}"
 openshift_master_cluster_method: "native"
 osm_default_node_selector: "node-role.kubernetes.io/compute=true"
-oreg_auth_user: "{{ oreg_auth_user_name }}"
-oreg_auth_password: "{{ oreg_auth_token }}"
 
 #openshift_docker_use_system_container=True
 #openshift_use_etcd_system_container=True
@@ -101,7 +99,7 @@ openshift_metrics_storage_volume_size: 5Gi
 
 
 # Logging
-openshift_logging_install_logging: false
+openshift_logging_install_logging: true
 #openshift_logging_storage_kind: dynamic
 #openshift_logging_es_pvc_dynamic: true
 openshift_logging_es_memory_limit: 4G

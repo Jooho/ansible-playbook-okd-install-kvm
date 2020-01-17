@@ -50,7 +50,7 @@ openshift_hosted_router_selector: 'node-role.kubernetes.io/infra=true'
 
 
 # Metrics
-openshift_metrics_install_metrics: true
+openshift_metrics_install_metrics: false
 openshift_metrics_cassandra_storage_type: dynamic
 openshift_metrics_storage_kind: dynamic
 openshift_metrics_storage_volume_size: 5Gi
@@ -65,7 +65,7 @@ openshift_logging_storage_volume_size: 5Gi
 
 
 # Prometheus
-openshift_hosted_prometheus_deploy: true
+openshift_hosted_prometheus_deploy: false
 openshift_prometheus_node_selector: {"node-role.kubernetes.io/compute":"true"}
 
 
