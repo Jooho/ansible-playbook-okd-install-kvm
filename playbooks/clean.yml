@@ -16,6 +16,13 @@
       become: yes
       delegate_to: "{{ interim_dns.install_host }}"
      
+    - name: restart NetworkManager
+      systemd:
+          name: NetworkManager # not required. Name of the service. When using in a chroot environment you always need to specify the full name i.e. (crond.service).
+          daemon_reload: yes # not required. run daemon-reload before doing any other operations, to make sure systemd has read any changes.
+          state: reloaded # not required. choices: reloaded;restarted;started;stopped. C(started)/C(stopped) are idempotent actions that will not run commands unless necessary. C(restarted) will always bounce the service. C(reloaded) will always reload.
+      become: yes
+
     - name: Gather files under KVM storage pool path
       find: 
         paths: "{{ kvm.storage_pool_dir |default('/var/lib/libvirt/images') }}"
