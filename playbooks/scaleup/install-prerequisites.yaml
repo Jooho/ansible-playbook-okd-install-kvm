@@ -1,0 +1,15 @@
+# Create a vm with the right formatted name (in this case app2.example.com) if you want to scale up with app3.example.com, then change item|int +1 to item|int + 2
+# Add new_nodes /etc/ansible/hosts
+# Execute ansible-playbook -i /etc/ansible/hosts install-prerequisites.yaml -vvvv -e @../../vars/all.yml
+# Execute ansible-playbook -i /etc/ansible/hosts playbooks/openshift-node/scaleup.yml -vvvv
+
+- name: Install OCP Host Pre-Requisites for new nodes
+  gather_facts: no
+  hosts: new_nodes
+  tasks:
+    - import_role:
+        name: Jooho.okd_prerequisites
+      vars:
+        node_type: okd-host
+        interim_dns_use: "{{ interim_dns.install }}"
+

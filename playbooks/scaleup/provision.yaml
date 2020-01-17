@@ -1,0 +1,66 @@
+# Create a vm with the right formatted name (in this case app2.example.com) if you want to scale up with app3.example.com, then change item|int +1 to item|int + 2
+# Add new_nodes /etc/ansible/hosts
+# Execute ansible-playbook -i /etc/ansible/hosts install-prerequisites.yaml -vvvv -e @../../vars/all.yml
+# Execute ansible-playbook -i /etc/ansible/hosts playbooks/openshift-node/scaleup.yml -vvvv
+
+- name: Install OCP Host Pre-Requisites for new nodes
+  hosts: localhost
+  gather_facts: no
+  vars:
+    app_num: 2
+  pre_tasks:
+    - name: Reload NetworkManager
+      systemd:
+          name: NetworkManager # not required. Name of the service. When using in a chroot environment you always need to specify the full name i.e. (crond.service).
+          daemon_reload: yes # not required. run daemon-reload before doing any other operations, to make sure systemd has read any changes.
+          state: reloaded # not required. choices: reloaded;restarted;started;stopped. C(started)/C(stopped) are idempotent actions that will not run commands unless necessary. C(restarted) will always bounce the service. C(reloaded) will always reload.
+      become: yes
+
+    - name: Create A App VM
+      include_role:   # for using loops
+        name: Jooho.kvm_operate
+      vars:
+        kind: vm
+        operate: clone
+        src_vm: "{{ base_vm_name }}"
+        dest_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{app_node_prefix}}_{{app_num}}"
+        vm_network_br: "{{ kvm.network_br }}"
+        dest_vm_hostname: "{{ app_node_prefix }}{{app_num}}.{{ okd_dns_domain}}"
+        vm_recreate: "{{ okd_vm_recreate }}"
+        vm_memory: "{{ app_vm_memory }}"
+
+    - name: Refresh inventory to ensure new instaces exist in inventory
+      meta: refresh_inventory
+
+    - name: Add dns record - hostname
+      include_role:
+        name: Jooho.dnsmasq_operate
+      vars:
+        dns_conf_name: "{{ interim_dns.dns_conf_name }}"
+        dns_conf_path: "{{ interim_dns.dns_conf_path }}" 
+        dns_ops: add
+        new_ip: "{{ hostvars[item]['ip'] }}"
+        new_hostname: "{{ hostvars[item]['hostname'] }}" 
+        rewrite_conf: "{{ interim_dns.rewrite_conf}}" 
+        dnsmasq_status: "{% if interim_dns.use_dnsmasq == true %}restarted{% else %}stopped{% endif %}"
+      with_items:
+      - "{{ groups[ 'group_' +  cluster_tag  + '_app_nodes'] }}"
+
+    - name: Reload NetworkManager
+      systemd:
+          name: NetworkManager # not required. Name of the service. When using in a chroot environment you always need to specify the full name i.e. (crond.service).
+          daemon_reload: yes # not required. run daemon-reload before doing any other operations, to make sure systemd has read any changes.
+          state: reloaded # not required. choices: reloaded;restarted;started;stopped. C(started)/C(stopped) are idempotent actions that will not run commands unless necessary. C(restarted) will always bounce the service. C(reloaded) will always reload.
+      become: yes
+
+    - name: Attach Storage to App Nodes
+      include_role:
+        name: Jooho.kvm_operate
+      vars:
+        kvm_vm_pool_dir: "{{ kvm.storage_pool_dir |default('/var/lib/libvirt/images')}}"
+        kind: storage
+        operate: attach
+        target_vm: "{{cluster_tag}}_OKD{{okd_version|replace('.','U')}}_{{base_image.os|upper()}}{{base_image.version|upper()}}_{{app_node_prefix}}_{{app_num}}"
+        disk_size: "{{ okd_docker_storage_size }}"
+
+

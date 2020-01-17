@@ -4,7 +4,7 @@ This script help deploy OKD on KVM and also provide some more features for refer
 
 
 ## Supported OS
-- Fedora 28
+- Fedora 31
 - CentOS 7
 
 ## Provision Operate Work Flows
@@ -40,3 +40,4 @@ This script help deploy OKD on KVM and also provide some more features for refer
 
 ### Demo
 - [Full Demo from scratch](./docs/full_demo.md)
+- [Scale App Node](./docs/scale_up.md)
