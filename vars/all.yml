@@ -10,11 +10,12 @@ cluster_tag: "{{ tag|default(default_cluster_tag) }}"
 kvm: 
   log_dir: /tmp/kvm 
   install_host: localhost
+  storage_pool_dir: /home/jooho/KVM
   network_br: okd
 
 
 # Base Image Config
-vm_data_dir: /home/jooho/kvm/vms
+vm_data_dir: /home/jooho/KVM/vms
 base_vm_name: CentOS_Base
 base_image:
   os: CentOS
@@ -30,7 +31,7 @@ base_image:
   vm_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
   vm_cpu: 3
   vm_memory: 4096
-  vm_root_disk_size: 20G
+  vm_root_disk_size: 30G
 
 # Interim DNS
 interim_dns:
@@ -40,6 +41,7 @@ interim_dns:
   rewrite_forward_conf: no
   install: false
   install_host: localhost
+  use_dnsmasq: false
   #forwarder_dns:
   #  - 8.8.8.8
 
@@ -55,7 +57,7 @@ okd_docker_storage_disk: vdb
 okd_interim_dns_use: true
 okd_interim_dns_ip: 192.168.200.1
 okd_dns_domain: example.com
-okd_cluster_subdomain: "cloudapps-{{cluster_tag}}.{{okd_dns_domain}}"
+okd_cluster_subdomain: "cloudapps.{{cluster_tag}}.{{okd_dns_domain}}"
 okd_master_cluster_hostname: "masters-{{cluster_tag}}.{{okd_dns_domain}}"
 okd_vm_recreate: false
 okd_ansible_playbook_path: /tmp/openshift-ansible
@@ -66,11 +68,11 @@ okd_ansible_playbook_path: /tmp/openshift-ansible
 # infra_node_vms
 # if etcd_node_vms is not specified, etcd will be deploying on masters
 # etcd_node_vms
-master_node_vms: 3
-master_vm_memory: 2G
-infra_node_vms: 3
+master_node_vms: 1
+master_vm_memory: 4G
+infra_node_vms: 1
 infra_vm_memory: 4G
-app_node_vms: 2
+app_node_vms: 1
 app_vm_memory: 4G
 lb_vm_memory: 2G
 master_node_prefix: master
