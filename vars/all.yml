@@ -10,12 +10,13 @@ cluster_tag: "{{ tag|default(default_cluster_tag) }}"
 kvm: 
   log_dir: /tmp/kvm 
   install_host: localhost
-  storage_pool_dir: /home/jooho/KVM
+  #storage_pool_dir: /home/jooho/KVM
+  storage_pool_dir: /var/lib/libvirt/images
   network_br: okd
 
 
 # Base Image Config
-vm_data_dir: /home/jooho/KVM/vms
+vm_data_dir: /var/lib/libvirt/images/vms
 base_vm_name: CentOS_Base
 base_image:
   os: CentOS
